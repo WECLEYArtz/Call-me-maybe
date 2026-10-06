@@ -1,11 +1,11 @@
-from json import JSONDecodeError
-from src.parser import (
-    args_parser,
+import sys
+from pydantic import ValidationError
+
+from src.parsing.arg_parsing import args_parser, Paths
+from src.parsing.input_parsing import (
     parse_inputs,
     FunctionCallingParserError,
-    Paths,
 )
-import sys
 
 # TODO: remove nested import later
 
