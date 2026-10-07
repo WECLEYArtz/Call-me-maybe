@@ -24,7 +24,7 @@ def generate_prompt_initialiser(funcdefs: list[FuncDef]):
 
 
 def entry_pieces_generator(
-    prompt: str, function_defs: list[FuncDef]
+    function_defs: list[FuncDef],
 ) -> Generator[str, None, None]:
     """Yield every key from the entry, containing all the modified elements.
 
@@ -33,7 +33,6 @@ def entry_pieces_generator(
     a double and curly braket is yielded
     """
 
-    yield f'{{"prompt":"{prompt}","name":'
     yield '"parameters":{'
     for fd in function_defs:
         yield f'"{fd.name}":'

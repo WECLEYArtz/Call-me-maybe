@@ -1,5 +1,5 @@
+from typing import Generator
 import json
-
 
 from typing import Literal
 from pydantic import BaseModel, ConfigDict, field_validator, ValidationError
@@ -19,7 +19,7 @@ class FuncDef(BaseModel):
     model_config = ConfigDict(extra="forbid")
     name: str
     description: str
-    params: dict[str, FunDefType]
+    parameters: dict[str, FunDefType]
     returns: FunDefType
 
     @field_validator("name", mode="after")
@@ -41,9 +41,21 @@ class FuncDef(BaseModel):
 
         return f"""- {self.name}
             Description: {self.description}
-            Parameters: {[f"{k} ({v.type})" for k,v in self.params.items()]}
+            Parameters: {[f"{k} ({v.type})" for k,v in self.parameters.items()]}
             Return: {self.returns.type}
         """
+
+    def next_param(self) -> Generator[str, None, None]:
+        param_names = list(self.parameters.keys())
+        yield f'"parameters":{{"{param_names[0]}":'
+        if len(param_names) > 1:
+            for name in param_names[1:]:
+                yield f',"{name}":'
+
+    def next_type(self) -> Generator[str, None, None]:
+        types = self.parameters.values()
+        for t in types:
+            yield t.type
 
 
 class FunctionDefinitions(BaseModel):

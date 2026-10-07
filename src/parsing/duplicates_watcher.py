@@ -1,4 +1,4 @@
-from src.errors import JsonDuplication
+from ..errors import JsonDuplication
 
 
 def duplicates_watcher(ordered_pairs) -> dict[str, str]:

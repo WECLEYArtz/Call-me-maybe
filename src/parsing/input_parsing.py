@@ -1,8 +1,8 @@
 import json
 from pydantic import BaseModel, ConfigDict, ValidationError, field_validator
 from pydantic_core import PydanticCustomError
-from src.errors import FunctionCallingParserError
-from src.parsing.duplicates_watcher import duplicates_watcher
+from ..errors import FunctionCallingParserError
+from .duplicates_watcher import duplicates_watcher
 
 
 class Prompt(BaseModel):
@@ -16,16 +16,19 @@ class Prompt(BaseModel):
             raise FunctionCallingParserError("Empty prompt")
         return prompt
 
+    def entry_piece(self) -> str:
+        return f'{{"prompt":"{self.prompt}","name":'
+
 
 class Prompts(BaseModel):
     inputs: list[Prompt]
 
 
-def parse_inputs(path: str) -> list[str]:
+def parse_inputs(path: str) -> list[Prompts]:
     with open(path) as f:
         try:
             file_data = json.load(f, object_pairs_hook=duplicates_watcher)
-            return [p.prompt for p in Prompts(inputs=file_data).inputs]
+            return Prompts(inputs=file_data).inputs
         except ValidationError:
             raise PydanticCustomError(
                 "Validation Error", "Invalid input file format"

@@ -1,7 +1,7 @@
 import sys
 
 from .parsing.arg_parsing import args_parser, Paths
-from .parsing.input_parsing import parse_inputs
+from .parsing.input_parsing import parse_inputs, Prompt
 from .parsing.function_definition_parsing import FuncDef, parse_func_def
 from .errors import FunctionCallingParserError
 from .feed_prompt import generate_prompt_initialiser
@@ -17,7 +17,7 @@ def main() -> None:
     paths: Paths = args_parser()
 
     function_defs: list[FuncDef] = parse_func_def(paths.fun_def)
-    prompts_list: list[str] = parse_inputs(paths.input)
+    prompts_list: list[Prompt] = parse_inputs(paths.input)
     init_prompt: str = generate_prompt_initialiser(function_defs)
 
     structures: list[str] = get_slm_answers(
