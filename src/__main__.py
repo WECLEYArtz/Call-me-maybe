@@ -1,22 +1,28 @@
 import sys
-from pydantic import ValidationError
 
-from src.parsing.arg_parsing import args_parser, Paths
-from src.parsing.input_parsing import (
-    parse_inputs,
-    FunctionCallingParserError,
-)
+from .parsing.arg_parsing import args_parser, Paths
+from .parsing.input_parsing import parse_inputs
+from .parsing.function_definition_parsing import FuncDef, parse_func_def
+from .errors import FunctionCallingParserError
+from .feed_prompt import generate_prompt_initialiser
+from .slm_comunication import get_slm_answers
 
 # TODO: remove nested import later
 
 
 def main() -> None:
-    """
-    Main function for the whole pipline.
+    """Main function for the whole pipline.
     ...
     """
     paths: Paths = args_parser()
-    prompts_list = parse_inputs(paths.input)
+
+    function_defs: list[FuncDef] = parse_func_def(paths.fun_def)
+    prompts_list: list[str] = parse_inputs(paths.input)
+    init_prompt: str = generate_prompt_initialiser(function_defs)
+
+    structures: list[str] = get_slm_answers(
+        prompts_list, function_defs, init_prompt
+    )
 
 
 if __name__ == "__main__":
@@ -28,5 +34,5 @@ if __name__ == "__main__":
         sys.exit(RED + "program Forcefully stopped, exiting..." + RESET)
     except FunctionCallingParserError as e:
         sys.exit(RED + str(e) + RESET)
-    except Exception as e:
-        sys.exit(RED + f"[{e.__class__.__name__}]: " + str(e) + RESET)
+    # except Exception as e:
+    #     sys.exit(RED + f"[{e.__class__.__name__}]: " + str(e) + RESET)
