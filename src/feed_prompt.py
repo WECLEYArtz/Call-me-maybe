@@ -8,9 +8,7 @@ Call exactly one of the provided functions.
 
 Rules:
 - Pick the function whose purpose best matches the request.
-- Use only parameters defined in the schema.
-- Copy values from the request exactly. Do not guess missing required values.
-- If no function fits, reply in plain text with no tool call.
+- Pick names from prompts when appropriate.
 
 Functions:
 {FUNCTIONS}
