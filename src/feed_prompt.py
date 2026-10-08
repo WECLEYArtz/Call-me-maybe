@@ -8,8 +8,6 @@ Call exactly one of the provided functions.
 
 Rules:
 - Pick the function whose purpose best matches the request.
-- Pick names from prompts when appropriate.
-- Pick values inside quotations without their quotations
 - Generate integers and numbers after double dots
 - Generate string after double quotes
 

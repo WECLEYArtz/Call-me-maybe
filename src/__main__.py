@@ -29,9 +29,7 @@ def main() -> None:
     )
 
     with open(paths.output, "w") as f:
-        result = [e for e in entries]
-        print("Array:", result)
-        json.dump(result, f, indent=4)
+        json.dump([e for e in entries], f, indent=4)
 
 
 if __name__ == "__main__":

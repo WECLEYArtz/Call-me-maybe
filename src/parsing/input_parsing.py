@@ -35,7 +35,7 @@ class Prompt(BaseModel):
         Returns:
             The beginning of the JSON function-call representation.
         """
-        return f'{{"prompt":{self.prompt},"name":"'
+        return f'{{"prompt":{json.dumps(self.prompt)},"name":"'
 
 
 class Prompts(BaseModel):
