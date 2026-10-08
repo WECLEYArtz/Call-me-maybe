@@ -17,7 +17,7 @@ class Prompt(BaseModel):
         return prompt
 
     def entry_piece(self) -> str:
-        return f'{{"prompt":"{self.prompt}","name":'
+        return f'{{"prompt":{json.dumps(self.prompt)},"name":'
 
 
 class Prompts(BaseModel):

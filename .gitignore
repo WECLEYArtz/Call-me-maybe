@@ -2,3 +2,4 @@ llm_sdk
 __pycache__
 plan.md
 *.lock
+moulinette

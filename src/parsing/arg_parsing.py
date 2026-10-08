@@ -6,7 +6,7 @@ class Paths:
         self,
         fun_def: str = "data/input/functions_definition.json",
         input: str = "data/input/function_calling_tests.json",
-        output: str = "data/output/function_calls.json",
+        output: str = "data/output/function_calling_results.json",
     ):
         self.fun_def: str = fun_def
         self.input: str = input

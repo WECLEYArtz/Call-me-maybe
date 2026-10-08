@@ -42,39 +42,6 @@ def get_slm_answers(
         else:
             return int(argmax(logits))
 
-    def contrain_str(
-        live_prompt: list[int], result_tokkens: list[int], tokken: int
-    ) -> int | None:
-        decoded = model_decode(tokken)
-
-        if '"' == decoded:
-            live_prompt.extend(tokken)
-            return None
-
-        tokken = model_encode(decoded.split('"')[0])
-        live_prompt.extend(tokken)
-        result_tokkens.extend(tokken)
-
-        if '"' in decoded:
-            return None
-
-        return tokken
-
-    def contrain_int(
-        live_prompt: list[int], result_tokkens: list[int], tokken: int
-    ) -> int | None:
-        decoded = model_decode(tokken)
-        if '"' in decoded:
-            return None
-
-        if not model_decode(result_tokkens + [tokken]).isdigit():
-            return None
-
-        live_prompt.append(tokken)
-        result_tokkens.append(tokken)
-
-        return tokken
-
     #  \======== Sub Functions =========/
 
     result_entries: list[str] = []
@@ -85,16 +52,19 @@ def get_slm_answers(
 
     tokken_of_space = model_encode(" ")[0]  # To start every appending
     tokken_of_quote = model_encode('"')[0]  # To start every appending
+    tokken_of_true = model_encode("true")[0]  # To start every appending
+    tokken_of_false = model_encode("false")[0]  # To start every appending
+    tokkens_of_digits = model_encode("0123456789")
 
     for prompt in prompts_list:
+        print(prompt)
         # Prepare first message to our SLM
-        print("[[ NEXT PROMPT: ]]", prompt)
         live_prmpt = initial_prompt_encoded.copy()
 
         # Insert first piece of the entry to all
         current_entry_str = prompt.entry_piece()  # entry start
         live_prmpt.extend(model_encode(current_entry_str))
-        next_tokken: int = tokken_of_space  # Use just newline for fisrt append
+        next_tokken: int = tokken_of_quote  # Use just newline for fisrt append
 
         # Function prediction section
         result_func_tokkens: tuple[int, ...] = ()
@@ -105,7 +75,7 @@ def get_slm_answers(
             result_func_tokkens += (next_tokken,)
             if result_func_tokkens in func_tokkens_to_fd:
                 break
-        live_prmpt.append(next_tokken)
+        live_prmpt.extend([next_tokken, tokken_of_quote])
         # decode the result function name and append it to entry
         current_entry_str += (
             '"' + model_decode(list(result_func_tokkens)) + '"'
@@ -121,39 +91,42 @@ def get_slm_answers(
 
             next_tokken: int = tokken_of_space
             result_tokkens: list[int] = []
-
             if typing == "integer" or typing == "number":
                 while 1:
-                    if not contrain_int(
-                        live_prmpt,
-                        result_tokkens,
-                        get_next_prediction(live_prmpt, []),
-                    ):
+                    tokken = get_next_prediction(live_prmpt, [])
+                    if tokken not in tokkens_of_digits:
                         break
+                    live_prmpt.append(tokken)
+                    result_tokkens.append(tokken)
+                if (
+                    typing == "number"
+                    and (decode := model_decode(result_tokkens)).isdigit()
+                ):
+                    result_tokkens = model_encode(str(float(int(decode))))
 
             elif typing == "string":
                 live_prmpt.append(tokken_of_quote)
                 result_tokkens.append(tokken_of_quote)
                 while 1:
-                    if not contrain_str(
-                        live_prmpt,
-                        result_tokkens,
-                        get_next_prediction(live_prmpt, []),
-                    ):
-                        live_prmpt.append(tokken_of_quote)
-                        result_tokkens.append(tokken_of_quote)
+                    tokken = get_next_prediction(live_prmpt, [])
+                    print("Prediction:", model_decode(tokken))
+                    decoded = model_decode(tokken)
+                    if (quote_index := decoded.find('"')) != -1:
+                        tokken = model_encode(decoded[0 : quote_index + 1])[0]
+                    live_prmpt.append(tokken)
+                    result_tokkens.append(tokken)
+                    if '"' in decoded:
                         break
             elif typing == "boolean":
-                pass
-                # BA9I BOOLEAN
+                bool_tokken = get_next_prediction(
+                    live_prmpt, [tokken_of_true, tokken_of_false]
+                )
+                live_prmpt.append(bool_tokken)
+                result_tokkens.append(bool_tokken)
             else:
                 raise ValueError("Unexpected typing during constrained decode")
                 result_tokkens.append(next_tokken)
             current_entry_str += model_decode(result_tokkens)
-
-        # ...parameters to be constrained
-        # Last step after the entry is closed with }
-
-        print(current_entry_str + "}}")
         result_entries.append(current_entry_str + "}}")
+        print(result_entries[-1])
     return result_entries

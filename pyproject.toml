@@ -18,4 +18,4 @@ dependencies = [
 line-length = 79   
 
 [tool.flake8]
-exclude = [".venv", "venv", "llm_sdk"]
+exclude = [".venv", "venv", "llm_sdk", "moulinette"]
