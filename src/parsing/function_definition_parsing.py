@@ -11,11 +11,15 @@ CONTROL_FLOW = {"if", "else", "for", "while", "break", "continue", "return"}
 
 
 class FunDefType(BaseModel):
+    """Describe one supported parameter or return type."""
+
     model_config = ConfigDict(extra="forbid")
     type: Literal["string", "number", "integer", "boolean"]
 
 
 class FuncDef(BaseModel):
+    """Validate and represent one callable function definition."""
+
     model_config = ConfigDict(extra="forbid")
     name: str
     description: str
@@ -25,6 +29,17 @@ class FuncDef(BaseModel):
     @field_validator("name", mode="after")
     @classmethod
     def validator(cls, name: str) -> str:
+        """Validate that a function name is usable.
+
+        Args:
+            name: Function name to validate.
+
+        Returns:
+            The normalized function name.
+
+        Raises:
+            FunctionDefinitionParserError: If the name is invalid.
+        """
         if (name := name.strip()) == "":
             raise FunctionDefinitionParserError(f"Empty function name, {name}")
         if not name.isidentifier():
@@ -38,6 +53,11 @@ class FuncDef(BaseModel):
         return name
 
     def __str__(self) -> str:
+        """Return a readable description for the initial model prompt.
+
+        Returns:
+            A formatted description of the function definition.
+        """
         return f"""- {self.name}
             Description: {self.description}
             Parameters: {[f"{k} ({v.type})"
@@ -46,6 +66,11 @@ class FuncDef(BaseModel):
         """
 
     def next_param(self) -> Generator[tuple[str, str, str], None, None]:
+        """Yield parameter names, JSON fragments, and declared types.
+
+        Yields:
+            Tuples containing a parameter name, JSON fragment, and type name.
+        """
         param_names = list(self.parameters.keys())
         param_type = [t.type for t in list(self.parameters.values())]
         yield (
@@ -58,11 +83,24 @@ class FuncDef(BaseModel):
 
 
 class FunctionDefinitions(BaseModel):
+    """Validate the top-level function-definition list."""
+
     model_config = ConfigDict(extra="forbid")
     definitions: list[FuncDef]
 
 
 def parse_func_def(path: str) -> list[FuncDef]:
+    """Load and validate function definitions from a JSON file.
+
+    Args:
+        path: Path to the function definitions JSON file.
+
+    Returns:
+        The validated function definitions.
+
+    Raises:
+        FunctionDefinitionParserError: If a definition cannot be parsed.
+    """
     try:
         with open(path) as f:
             file_data = json.load(f, object_pairs_hook=duplicates_watcher)

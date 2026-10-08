@@ -1,37 +1,40 @@
 class JsonDuplication(Exception):
-    """Represent all sorts of parsing."""
+    """Represent a duplicate key found while parsing JSON."""
 
     message: str = "Issue parsing json file: Keys duplication: "
 
     def __init__(self, detail: str):
-        """Initialise error class.
+        """Initialize the exception with additional error details.
 
-        message: error message.
+        Args:
+            detail: Details describing the duplicated key.
         """
         super().__init__(self.message + detail)
 
 
 class FunctionCallingParserError(Exception):
-    """Represent error when parsing function calling json file."""
+    """Represent an error when parsing a function-calling JSON file."""
 
     message: str = "Issue parsing function calling json file: "
 
     def __init__(self, detail: str):
-        """Initialise error class.
+        """Initialize the exception with additional error details.
 
-        message: error message.
+        Args:
+            detail: Details describing the parsing error.
         """
         super().__init__(self.message + detail)
 
 
 class FunctionDefinitionParserError(Exception):
-    """Represent error when parsing function calling json file."""
+    """Represent an error when parsing a function-definition JSON file."""
 
     message: str = "Issue parsing function calling json file: "
 
     def __init__(self, detail: str):
-        """Initialise error class.
+        """Initialize the exception with additional error details.
 
-        message: error message.
+        Args:
+            detail: Details describing the parsing error.
         """
         super().__init__(self.message + detail)

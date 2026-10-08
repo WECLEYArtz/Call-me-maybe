@@ -19,6 +19,14 @@ Functions:
 
 
 def generate_prompt_initialiser(funcdefs: list[FuncDef]) -> str:
+    """Build the initial prompt from the available function definitions.
+
+    Args:
+        funcdefs: Function definitions to include in the prompt.
+
+    Returns:
+        The initial prompt passed to the language model.
+    """
     functions_list_str: str = "\n".join([str(funcdef) for funcdef in funcdefs])
     init_prompt = INIT_PROMPT_TEMPLATE.format(FUNCTIONS=functions_list_str)
     return init_prompt
@@ -27,11 +35,13 @@ def generate_prompt_initialiser(funcdefs: list[FuncDef]) -> str:
 def entry_pieces_generator(
     function_defs: list[FuncDef],
 ) -> Generator[str, None, None]:
-    """Yield every key from the entry, containing all the modified elements.
+    """Yield JSON fragments used to start a function-call entry.
 
-    The entry contains the prompt and prameters
-    when all prompts and parameters ae used,
-    a double and curly braket is yielded
+    Args:
+        function_defs: Function definitions whose parameters are represented.
+
+    Yields:
+        JSON fragments for the generated parameter object.
     """
 
     yield '"parameters":{'

@@ -8,11 +8,18 @@ from .parsing.function_definition_parsing import FuncDef
 
 
 class Entry:
+    """Represent a generated function call."""
+
     prompt: str
     name: str
     parameters: dict[str, str | int] = {}
 
     def make(self) -> dict[str, str | dict[str, str | int]]:
+        """Return the entry in the output JSON format.
+
+        Returns:
+            A dictionary containing the prompt, function name, and parameters.
+        """
         return {
             "prompt": self.prompt,
             "name": self.name,
@@ -21,6 +28,15 @@ class Entry:
 
 
 def get_list_of_index(matrix: list[list[int]], i: int) -> list[int]:
+    """Return values at index ``i`` from rows containing that index.
+
+    Args:
+        matrix: Rows from which values should be selected.
+        i: Index to read from each row.
+
+    Returns:
+        Values found at the requested index.
+    """
     return [lst[i] for lst in matrix if len(lst) > i]
 
 
@@ -29,16 +45,47 @@ def get_slm_answers(
     function_definitions: list[FuncDef],
     init_prompt: str,
 ) -> list[dict]:
+    """Generate structured function calls for the supplied prompts.
+
+    Args:
+        prompts_list: Prompts to convert into function calls.
+        function_definitions: Functions that the model may select.
+        init_prompt: Prompt describing the available functions.
+
+    Returns:
+        Generated function-call dictionaries in input order.
+    """
     model = Small_LLM_Model()
 
     #  /======== Sub Functions =========\
     def model_encode(string: str) -> list[int]:
+        """Encode text and return its token IDs as a plain list.
+
+        Args:
+            string: Text to encode.
+
+        Returns:
+            The encoded token IDs.
+        """
         return model.encode(string)[0].tolist()
 
     def model_decode(tokkens: list[int]) -> str:
+        """Decode a list of token IDs into text.
+
+        Args:
+            tokkens: Token IDs to decode.
+
+        Returns:
+            The decoded text.
+        """
         return model.decode(tokkens)
 
     def get_func_tokkens_to_fd() -> dict[tuple[int, ...], FuncDef]:
+        """Map each encoded function name to its function definition.
+
+        Returns:
+            A lookup table keyed by function-name token sequences.
+        """
         function_tokens: dict[tuple[int, ...], FuncDef] = {}
         for fd in function_definitions:
             function_tokens.update({tuple(model_encode(fd.name)): fd})
@@ -47,6 +94,15 @@ def get_slm_answers(
     def get_next_prediction(
         live_prompt: list[int], mask_targets: list[int]
     ) -> int:
+        """Return the highest-logit token from the allowed targets.
+
+        Args:
+            live_prompt: Token IDs already generated for the current prompt.
+            mask_targets: Token IDs allowed for the next prediction.
+
+        Returns:
+            The selected next token ID.
+        """
         logits = np.array(model.get_logits_from_input_ids(live_prompt))
         if len(mask_targets):
             mask = np.full_like(logits, -np.inf)

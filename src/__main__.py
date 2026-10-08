@@ -12,8 +12,10 @@ from .slm_comunication import get_slm_answers
 
 
 def main() -> None:
-    """Main function for the whole pipline.
-    ...
+    """Parse inputs, generate function calls, and save the results.
+
+    Returns:
+        None.
     """
     paths: Paths = args_parser()
     os.makedirs(os.path.dirname(paths.output), exist_ok=True)
