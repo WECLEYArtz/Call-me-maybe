@@ -18,7 +18,7 @@ Functions:
 """
 
 
-def generate_prompt_initialiser(funcdefs: list[FuncDef]):
+def generate_prompt_initialiser(funcdefs: list[FuncDef]) -> str:
     functions_list_str: str = "\n".join([str(funcdef) for funcdef in funcdefs])
     init_prompt = INIT_PROMPT_TEMPLATE.format(FUNCTIONS=functions_list_str)
     return init_prompt

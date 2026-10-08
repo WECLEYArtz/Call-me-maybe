@@ -17,14 +17,14 @@ class Prompt(BaseModel):
         return prompt
 
     def entry_piece(self) -> str:
-        return f'{{"prompt":{json.dumps(self.prompt)},"name":'
+        return f'{{"prompt":{self.prompt},"name":"'
 
 
 class Prompts(BaseModel):
     inputs: list[Prompt]
 
 
-def parse_inputs(path: str) -> list[Prompts]:
+def parse_inputs(path: str) -> list[Prompt]:
     with open(path) as f:
         try:
             file_data = json.load(f, object_pairs_hook=duplicates_watcher)

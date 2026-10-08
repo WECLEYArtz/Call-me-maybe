@@ -8,6 +8,8 @@ requires-python = ">=3.10"
 dependencies = [
     "flake8>=7.4.1",
     "flake8-pyproject>=1.2.4",
+    "llm-sdk>=0.1.0",
+    "mypy>=2.4.0",
     "numpy>=2.2.6",
     "pydantic>=2.13.5",
     "torch>=2.14.1",
@@ -19,3 +21,9 @@ line-length = 79
 
 [tool.flake8]
 exclude = [".venv", "venv", "llm_sdk", "moulinette"]
+
+[tool.mypy]
+exclude = [".venv", "venv", "llm_sdk", "moulinette"]
+
+[tool.uv.sources]
+llm_sdk = { path = "llm_sdk", editable = true }

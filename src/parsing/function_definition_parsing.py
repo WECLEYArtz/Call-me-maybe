@@ -37,7 +37,7 @@ class FuncDef(BaseModel):
             )
         return name
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"""- {self.name}
             Description: {self.description}
             Parameters: {[f"{k} ({v.type})"
@@ -45,12 +45,16 @@ class FuncDef(BaseModel):
             Return: {self.returns.type}
         """
 
-    def next_param_piece_type(self) -> Generator[tuple[str, str], None, None]:
+    def next_param(self) -> Generator[tuple[str, str, str], None, None]:
         param_names = list(self.parameters.keys())
         param_type = [t.type for t in list(self.parameters.values())]
-        yield (f',"parameters":{{"{param_names[0]}":', param_type[0])
+        yield (
+            param_names[0],
+            f',"parameters":{{"{param_names[0]}":',
+            param_type[0],
+        )
         for i in range(1, len(param_names)):
-            yield (f',"{param_names[i]}":', param_type[i])
+            yield (param_names[i], f',"{param_names[i]}":', param_type[i])
 
 
 class FunctionDefinitions(BaseModel):

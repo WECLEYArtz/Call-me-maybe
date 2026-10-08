@@ -24,12 +24,14 @@ def main() -> None:
     prompts_list: list[Prompt] = parse_inputs(paths.input)
     init_prompt: str = generate_prompt_initialiser(function_defs)
 
-    entries: list[str] = get_slm_answers(
+    entries: list[dict] = get_slm_answers(
         prompts_list, function_defs, init_prompt
     )
 
     with open(paths.output, "w") as f:
-        json.dump([json.loads(e) for e in entries], f, indent=4)
+        result = [e for e in entries]
+        print("Array:", result)
+        json.dump(result, f, indent=4)
 
 
 if __name__ == "__main__":
