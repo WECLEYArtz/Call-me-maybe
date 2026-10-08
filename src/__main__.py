@@ -10,8 +10,6 @@ from .errors import FunctionCallingParserError
 from .feed_prompt import generate_prompt_initialiser
 from .slm_comunication import get_slm_answers
 
-# TODO: Directory check for safety
-
 
 def main() -> None:
     """Main function for the whole pipline.
@@ -43,7 +41,5 @@ if __name__ == "__main__":
         sys.exit(RED + "program Forcefully stopped, exiting..." + RESET)
     except FunctionCallingParserError as e:
         sys.exit(RED + str(e) + RESET)
-# NOTE: Remove comment
-
-# except Exception as e:
-#     sys.exit(RED + f"[{e.__class__.__name__}]: " + str(e) + RESET)
+    except Exception as e:
+        sys.exit(RED + f"[{e.__class__.__name__}]: " + str(e) + RESET)

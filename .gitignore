@@ -3,3 +3,6 @@ __pycache__
 plan.md
 *.lock
 moulinette
+*.pdf
+*.html
+
