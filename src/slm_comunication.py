@@ -3,7 +3,7 @@ from numpy import argmax
 
 import numpy as np
 
-from llm_sdk import Small_LLM_Model
+from llm_sdk import Small_LLM_Model  # type: ignore
 from .parsing.function_definition_parsing import FuncDef
 
 
@@ -67,7 +67,7 @@ def get_slm_answers(
         Returns:
             The encoded token IDs.
         """
-        return model.encode(string)[0].tolist()
+        return list(i for i in model.encode(string)[0].tolist())
 
     def model_decode(tokkens: list[int]) -> str:
         """Decode a list of token IDs into text.
@@ -78,7 +78,7 @@ def get_slm_answers(
         Returns:
             The decoded text.
         """
-        return model.decode(tokkens)
+        return str(model.decode(tokkens))
 
     def get_func_tokkens_to_fd() -> dict[tuple[int, ...], FuncDef]:
         """Map each encoded function name to its function definition.
@@ -203,6 +203,7 @@ def get_slm_answers(
                     live_prmpt, [tokken_of_true, tokken_of_false]
                 )
                 result_value = model_decode([result_bool_token])
+            assert isinstance(entry["parameters"], dict)
             entry["parameters"].update({name: result_value})
         result_entries.append(entry)
         print(result_entries[-1])
